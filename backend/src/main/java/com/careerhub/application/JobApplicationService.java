@@ -60,6 +60,12 @@ public class JobApplicationService {
         return app;
     }
 
+//    find one application
+
+    public JobApplicationResponse findOne(Long id) {
+        return toResponse(findOwnedOrThrow(id));
+    }
+
     private void applyRequest(JobApplication app, JobApplicationRequest request) {
         app.setCompanyName(request.companyName());
         app.setJobTitle(request.jobTitle());
