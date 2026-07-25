@@ -18,3 +18,8 @@ export async function updateApplication(id, payload) {
 export async function deleteApplication(id) {
   await apiClient.delete(`/applications/${id}`)
 }
+
+export async function getApplication(id) {
+  const { data } = await apiClient.get(`/applications/${id}`)
+  return data
+}
