@@ -47,7 +47,7 @@ export default function Applications() {
         <tbody>
           {apps.map((app) => (
             <tr key={app.id}>
-              <td>{app.companyName}</td>
+              <td><Link to={`/applications/${app.id}`}>{app.companyName}</Link></td>
               <td>{app.jobTitle}</td>
               <td>{app.applicationDate}</td>
               <td>{app.status}</td>
