@@ -17,7 +17,9 @@ public class InterviewController {
         this.service = service;
     }
 
-    // Nested under the application because every interview belongs to an application.    @GetMapping("/api/applications/{applicationId}/interviews")
+//    Nested under the application because every interview belongs to an application.
+
+    @GetMapping("/api/applications/{applicationId}/interviews")
     public List<InterviewResponse> findByApplication(@PathVariable Long applicationId) {
         return service.findByApplication(applicationId);
     }
