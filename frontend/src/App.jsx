@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard'
 
 import Applications from './pages/Applications'
 import ApplicationForm from './pages/ApplicationForm'
+import ApplicationDetail from './pages/ApplicationDetail'
+
 
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
           <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
           <Route path="/applications/new" element={<ProtectedRoute><ApplicationForm /></ProtectedRoute>} />
           <Route path="/applications/:id/edit" element={<ProtectedRoute><ApplicationForm /></ProtectedRoute>} />
+          <Route path="/applications/:id" element={<ProtectedRoute><ApplicationDetail /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

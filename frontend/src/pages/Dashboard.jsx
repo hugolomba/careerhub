@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext'
+import { Link } from 'react-router-dom'
 
 // Placeholder for Requirement 6 (Analytics Dashboard).
 // Once the /api/applications and /api/interviews endpoints exist, fetch
