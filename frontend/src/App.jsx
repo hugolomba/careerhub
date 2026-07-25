@@ -5,6 +5,9 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 
+import Applications from './pages/Applications'
+import ApplicationForm from './pages/ApplicationForm'
+
 export default function App() {
   return (
     <AuthProvider>
@@ -21,6 +24,9 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
+          <Route path="/applications/new" element={<ProtectedRoute><ApplicationForm /></ProtectedRoute>} />
+          <Route path="/applications/:id/edit" element={<ProtectedRoute><ApplicationForm /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
