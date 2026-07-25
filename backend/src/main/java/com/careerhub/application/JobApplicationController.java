@@ -23,6 +23,12 @@ public class JobApplicationController {
         return service.findAllForCurrentUser(status);
     }
 
+    // GET a specific application
+    @GetMapping("/{id}")
+    public JobApplicationResponse findOne(@PathVariable Long id) {
+        return service.findOne(id);
+    }
+
     @PostMapping
     public ResponseEntity<JobApplicationResponse> create(@Valid @RequestBody JobApplicationRequest request) {
         return ResponseEntity.ok(service.create(request));
