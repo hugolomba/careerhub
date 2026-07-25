@@ -1,0 +1,20 @@
+# Local development database.
+# Run: docker compose up -d
+# This gives you a Postgres instance matching the credentials already
+# configured in backend/src/main/resources/application.yml.
+services:
+  postgres:
+    image: postgres:16
+    container_name: careerhub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: careerhub
+      POSTGRES_USER: careerhub
+      POSTGRES_PASSWORD: careerhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - careerhub_pgdata:/var/lib/postgresql/data
+
+volumes:
+  careerhub_pgdata:

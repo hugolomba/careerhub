@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: careerhub-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/careerhub
+    username: careerhub
+    password: careerhub
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # schema is managed by Flyway, not Hibernate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    # In production, load this from an environment variable, never hardcode it.
+    secret: ${JWT_SECRET:change-this-to-a-long-random-string-at-least-256-bits-for-hs256}
+    expiration-ms: 86400000 # 24h
