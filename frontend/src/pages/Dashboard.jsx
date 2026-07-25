@@ -12,6 +12,8 @@ export default function Dashboard() {
       <h1>Welcome, {user?.fullName}</h1>
       <p>This is where the analytics dashboard (Requirement 6) will go.</p>
       <button onClick={logout}>Log out</button>
+
+      <Link to="/applications">View Applications</Link>
     </div>
   )
 }
