@@ -55,12 +55,10 @@ public class JobApplicationService {
         JobApplication app = applicationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Application not found"));
         if (!app.getUser().getId().equals(currentUser().getId())) {
-            throw new IllegalArgumentException("Application not found"); // não vaza que existe de outro user
+            throw new IllegalArgumentException("Application not found"); // don't leak that it belongs to another user
         }
         return app;
     }
-
-//    find one application
 
     public JobApplicationResponse findOne(Long id) {
         return toResponse(findOwnedOrThrow(id));
