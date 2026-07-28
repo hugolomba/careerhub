@@ -1,7 +1,6 @@
-# Local development database.
-# Run: docker compose up -d
-# This gives you a Postgres instance matching the credentials already
-# configured in backend/src/main/resources/application.yml.
+# Full local stack: Postgres + Spring Boot backend + React frontend (served via nginx).
+# Run: docker compose up -d --build
+# Frontend: http://localhost:3000  |  Backend API: http://localhost:8080/api
 services:
   postgres:
     image: postgres:16
@@ -15,6 +14,38 @@ services:
       - "5432:5432"
     volumes:
       - careerhub_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careerhub"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: careerhub-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/careerhub
+      SPRING_DATASOURCE_USERNAME: careerhub
+      SPRING_DATASOURCE_PASSWORD: careerhub
+      CV_STORAGE_DIR: /app/cv-storage
+    ports:
+      - "8080:8080"
+    volumes:
+      - careerhub_cv_storage:/app/cv-storage
+
+  frontend:
+    build: ./frontend
+    container_name: careerhub-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
 
 volumes:
   careerhub_pgdata:
+  careerhub_cv_storage:
