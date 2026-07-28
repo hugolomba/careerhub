@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 public record InterviewResponse(
         Long id,
         Long applicationId,
+        String companyName,
+        String jobTitle,
         LocalDateTime interviewDate,
         InterviewType type,
         String stage,

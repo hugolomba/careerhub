@@ -28,8 +28,15 @@ public class InterviewService {
     }
 
     public List<InterviewResponse> findByApplication(Long applicationId) {
-        ownedApplicationOrThrow(applicationId); // garante que a application é do usuário logado
+        ownedApplicationOrThrow(applicationId); // makes sure the application belongs to the logged-in user
         return interviewRepository.findByApplicationId(applicationId).stream().map(this::toResponse).toList();
+    }
+
+    // Powers the standalone Interviews page (RS section 4.1: "list of all
+    // upcoming and past interviews with links to parent applications").
+    public List<InterviewResponse> findAllForCurrentUser() {
+        return interviewRepository.findByApplication_UserId(currentUser().getId())
+                .stream().map(this::toResponse).toList();
     }
 
     public InterviewResponse create(Long applicationId, InterviewRequest request) {
@@ -86,6 +93,8 @@ public class InterviewService {
         return new InterviewResponse(
                 interview.getId(),
                 interview.getApplication().getId(),
+                interview.getApplication().getCompanyName(),
+                interview.getApplication().getJobTitle(),
                 interview.getInterviewDate(),
                 interview.getType(),
                 interview.getStage(),

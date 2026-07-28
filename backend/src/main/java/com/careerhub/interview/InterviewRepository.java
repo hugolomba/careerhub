@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
     List<Interview> findByApplicationId(Long applicationId);
+    List<Interview> findByApplication_UserId(Long userId);
 }
