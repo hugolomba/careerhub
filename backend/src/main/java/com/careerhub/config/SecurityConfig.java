@@ -70,8 +70,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Update this once the React dev server / deployed frontend URL is known.
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // 5173 = Vite dev server, 3000 = the dockerized frontend (see docker-compose.yml).
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
