@@ -6,6 +6,14 @@ const STYLES = {
   WITHDRAWN: 'bg-slate-100 text-slate-500',
 }
 
+const DOTS = {
+  APPLIED: 'bg-slate-400',
+  INTERVIEWING: 'bg-amber-500',
+  OFFER: 'bg-emerald-500',
+  REJECTED: 'bg-rose-500',
+  WITHDRAWN: 'bg-slate-400',
+}
+
 const LABELS = {
   APPLIED: 'Applied',
   INTERVIEWING: 'Interviewing',
@@ -16,7 +24,8 @@ const LABELS = {
 
 export default function StatusBadge({ status }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STYLES[status] || STYLES.APPLIED}`}>
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${STYLES[status] || STYLES.APPLIED}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${DOTS[status] || DOTS.APPLIED}`} />
       {LABELS[status] || status}
     </span>
   )
