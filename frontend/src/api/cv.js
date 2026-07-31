@@ -5,11 +5,10 @@ export async function listCvs() {
   return data
 }
 
-export async function uploadCv(file, label, applicationId) {
+export async function uploadCv(file, label) {
   const formData = new FormData()
   formData.append('file', file)
   if (label) formData.append('label', label)
-  if (applicationId) formData.append('applicationId', applicationId)
 
   const { data } = await apiClient.post('/cv', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
