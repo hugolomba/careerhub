@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getApplication } from '../api/applications'
+import { getApplication, updateApplication } from '../api/applications'
 import { listInterviews, createInterview, deleteInterview } from '../api/interviews'
-import StatusBadge from '../components/StatusBadge'
+import { downloadCv } from '../api/cv'
+import StatusSelect from '../components/StatusSelect'
+import { ArrowLeftIcon, DocumentIcon } from '../components/icons'
 
 const TYPE_LABELS = { PHONE: 'Phone', VIDEO: 'Video', ONSITE: 'On-site' }
+const INPUT = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30'
 
 export default function ApplicationDetail() {
   const { id } = useParams()
@@ -22,6 +25,11 @@ export default function ApplicationDetail() {
     setInterviews(await listInterviews(id))
   }
 
+  async function handleStatusChange(status) {
+    setApp((prev) => ({ ...prev, status }))
+    await updateApplication(id, { ...app, status })
+  }
+
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
@@ -36,23 +44,26 @@ export default function ApplicationDetail() {
     await createInterview(id, form)
     setForm({ interviewDate: '', type: 'PHONE', stage: '', notes: '' })
     loadInterviews()
+    // Scheduling an interview may have auto-advanced the status server-side.
+    getApplication(id).then(setApp)
   }
 
   if (!app) return <p className="text-sm text-slate-500">Loading...</p>
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link to="/applications" className="text-sm font-medium text-primary-600 hover:text-primary-700">
-        &larr; Back to applications
+      <Link to="/applications" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700">
+        <ArrowLeftIcon className="h-3.5 w-3.5" />
+        Back to applications
       </Link>
 
-      <div className="mt-3 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold text-slate-900">{app.jobTitle}</h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">{app.jobTitle}</h1>
             <p className="text-slate-500">{app.companyName}</p>
           </div>
-          <StatusBadge status={app.status} />
+          <StatusSelect status={app.status} onChange={handleStatusChange} />
         </div>
         <dl className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
           <div>
@@ -69,6 +80,22 @@ export default function ApplicationDetail() {
               </dd>
             </div>
           )}
+          <div>
+            <dt className="text-slate-400">CV used</dt>
+            <dd>
+              {app.cvId ? (
+                <button
+                  onClick={() => downloadCv(app.cvId, app.cvFileName)}
+                  className="inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700"
+                >
+                  <DocumentIcon className="h-3.5 w-3.5" />
+                  {app.cvLabel || app.cvFileName}
+                </button>
+              ) : (
+                <span className="text-slate-400">None linked</span>
+              )}
+            </dd>
+          </div>
         </dl>
         {app.notes && (
           <div className="mt-4 border-t border-slate-100 pt-4">
@@ -86,7 +113,7 @@ export default function ApplicationDetail() {
           {interviews.map((iv) => (
             <li
               key={iv.id}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-soft"
             >
               <div>
                 <span className="font-medium text-slate-800">{new Date(iv.interviewDate).toLocaleString()}</span>
@@ -108,7 +135,7 @@ export default function ApplicationDetail() {
         </ul>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <form onSubmit={handleSubmit} className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
         <h3 className="mb-4 text-sm font-semibold text-slate-700">Add interview</h3>
         {warning && (
           <p role="alert" className="mb-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -120,14 +147,14 @@ export default function ApplicationDetail() {
             <label className="mb-1 block text-sm font-medium text-slate-700">Date/time</label>
             <input
               type="datetime-local" name="interviewDate" value={form.interviewDate} onChange={handleChange} required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className={INPUT}
             />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Type</label>
             <select
               name="type" value={form.type} onChange={handleChange}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className={INPUT}
             >
               <option value="PHONE">Phone</option>
               <option value="VIDEO">Video</option>
@@ -139,20 +166,20 @@ export default function ApplicationDetail() {
             <input
               name="stage" value={form.stage} onChange={handleChange}
               placeholder="e.g. Technical round"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className={INPUT}
             />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Notes</label>
             <input
               name="notes" value={form.notes} onChange={handleChange}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className={INPUT}
             />
           </div>
         </div>
         <button
           type="submit"
-          className="mt-4 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+          className="mt-4 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-primary-700"
         >
           Save interview
         </button>
