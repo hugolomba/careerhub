@@ -34,3 +34,6 @@ app:
     expiration-ms: 86400000 # 24h
   cv:
     storage-dir: ${CV_STORAGE_DIR:./cv-storage}
+  cors:
+    # Comma-separated list of allowed origins, e.g. https://careerhub.vercel.app,https://app.example.com
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
