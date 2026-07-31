@@ -1,5 +1,6 @@
 package com.careerhub.interview;
 
+import com.careerhub.application.ApplicationStatus;
 import com.careerhub.application.JobApplication;
 import com.careerhub.application.JobApplicationRepository;
 import com.careerhub.interview.dto.InterviewRequest;
@@ -45,6 +46,13 @@ public class InterviewService {
         interview.setApplication(application);
         applyRequest(interview, request);
         interviewRepository.save(interview);
+
+        // Scheduling an interview is a clear signal the application moved forward.
+        if (application.getStatus() == ApplicationStatus.APPLIED) {
+            application.setStatus(ApplicationStatus.INTERVIEWING);
+            applicationRepository.save(application);
+        }
+
         return toResponse(interview);
     }
 
