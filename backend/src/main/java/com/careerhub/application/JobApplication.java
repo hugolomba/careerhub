@@ -1,5 +1,6 @@
 package com.careerhub.application;
 
+import com.careerhub.cv.CvDocument;
 import com.careerhub.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,6 +48,11 @@ public class JobApplication {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+    // The CV version used for this application. A CV may be reused across many applications.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cv_id")
+    private CvDocument cv;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

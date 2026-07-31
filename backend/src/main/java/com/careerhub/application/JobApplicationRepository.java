@@ -7,4 +7,5 @@ import java.util.List;
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
     List<JobApplication> findByUserId(Long userId);
     List<JobApplication> findByUserIdAndStatus(Long userId, ApplicationStatus status);
+    List<JobApplication> findByCvId(Long cvId);
 }

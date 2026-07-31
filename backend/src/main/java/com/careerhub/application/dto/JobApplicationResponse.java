@@ -11,5 +11,8 @@ public record JobApplicationResponse(
         LocalDate applicationDate,
         ApplicationStatus status,
         String jobUrl,
-        String notes
+        String notes,
+        Long cvId,
+        String cvFileName,
+        String cvLabel
 ) {}

@@ -1,6 +1,5 @@
 package com.careerhub.cv;
 
-import com.careerhub.application.JobApplication;
 import com.careerhub.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,11 +22,6 @@ public class CvDocument {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    // Optional: a CV can exist without being tied to one specific application yet.
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_id")
-    private JobApplication application;
 
     @Column(name = "file_name", nullable = false, length = 255)
     private String fileName;

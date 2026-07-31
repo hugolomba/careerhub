@@ -35,6 +35,8 @@ class JobApplicationServiceTest {
     private JobApplicationRepository applicationRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private com.careerhub.cv.CvRepository cvRepository;
 
     @InjectMocks
     private JobApplicationService service;
@@ -57,7 +59,7 @@ class JobApplicationServiceTest {
     void create_savesApplication_forCurrentUser() {
         when(userRepository.findByEmail("hugo@example.com")).thenReturn(Optional.of(currentUser));
         JobApplicationRequest request = new JobApplicationRequest(
-                "Acme Corp", "Backend Engineer", LocalDate.of(2026, 6, 1), null, "https://acme.example/job", "Referred by a friend");
+                "Acme Corp", "Backend Engineer", LocalDate.of(2026, 6, 1), null, "https://acme.example/job", "Referred by a friend", null);
 
         JobApplicationResponse response = service.create(request);
 
@@ -88,7 +90,7 @@ class JobApplicationServiceTest {
         when(applicationRepository.findById(99L)).thenReturn(Optional.of(existing));
 
         JobApplicationRequest request = new JobApplicationRequest(
-                "Acme Corp", "Backend Engineer", LocalDate.of(2026, 6, 1), ApplicationStatus.INTERVIEWING, null, null);
+                "Acme Corp", "Backend Engineer", LocalDate.of(2026, 6, 1), ApplicationStatus.INTERVIEWING, null, null, null);
 
         assertThatThrownBy(() -> service.update(99L, request))
                 .isInstanceOf(IllegalArgumentException.class)

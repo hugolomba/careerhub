@@ -2,6 +2,8 @@ package com.careerhub.application;
 
 import com.careerhub.application.dto.JobApplicationRequest;
 import com.careerhub.application.dto.JobApplicationResponse;
+import com.careerhub.cv.CvDocument;
+import com.careerhub.cv.CvRepository;
 import com.careerhub.user.User;
 import com.careerhub.user.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,10 +17,12 @@ public class JobApplicationService {
 
     private final JobApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final CvRepository cvRepository;
 
-    public JobApplicationService(JobApplicationRepository applicationRepository, UserRepository userRepository) {
+    public JobApplicationService(JobApplicationRepository applicationRepository, UserRepository userRepository, CvRepository cvRepository) {
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
+        this.cvRepository = cvRepository;
     }
 
     public List<JobApplicationResponse> findAllForCurrentUser(ApplicationStatus statusFilter) {
@@ -71,6 +75,14 @@ public class JobApplicationService {
         app.setStatus(request.status() != null ? request.status() : ApplicationStatus.APPLIED);
         app.setJobUrl(request.jobUrl());
         app.setNotes(request.notes());
+        app.setCv(resolveCv(request.cvId()));
+    }
+
+    private CvDocument resolveCv(Long cvId) {
+        if (cvId == null) return null;
+        return cvRepository.findById(cvId)
+                .filter(cv -> cv.getUser().getId().equals(currentUser().getId()))
+                .orElseThrow(() -> new IllegalArgumentException("CV not found"));
     }
 
     private User currentUser() {
@@ -79,9 +91,13 @@ public class JobApplicationService {
     }
 
     private JobApplicationResponse toResponse(JobApplication app) {
+        CvDocument cv = app.getCv();
         return new JobApplicationResponse(
                 app.getId(), app.getCompanyName(), app.getJobTitle(),
-                app.getApplicationDate(), app.getStatus(), app.getJobUrl(), app.getNotes()
+                app.getApplicationDate(), app.getStatus(), app.getJobUrl(), app.getNotes(),
+                cv != null ? cv.getId() : null,
+                cv != null ? cv.getFileName() : null,
+                cv != null ? cv.getLabel() : null
         );
     }
 }

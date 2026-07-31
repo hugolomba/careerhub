@@ -1,8 +1,8 @@
 package com.careerhub.cv;
 
-import com.careerhub.application.JobApplication;
 import com.careerhub.application.JobApplicationRepository;
 import com.careerhub.cv.dto.CvResponse;
+import com.careerhub.cv.dto.CvUsageResponse;
 import com.careerhub.user.User;
 import com.careerhub.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +47,7 @@ public class CvService {
         return cvRepository.findByUserId(currentUser().getId()).stream().map(this::toResponse).toList();
     }
 
-    public CvResponse upload(MultipartFile file, String label, Long applicationId) {
+    public CvResponse upload(MultipartFile file, String label) {
         String originalName = file.getOriginalFilename();
         String extension = extensionOf(originalName);
 
@@ -61,12 +61,6 @@ public class CvService {
         }
 
         User user = currentUser();
-        JobApplication application = null;
-        if (applicationId != null) {
-            application = applicationRepository.findById(applicationId)
-                    .filter(a -> a.getUser().getId().equals(user.getId()))
-                    .orElseThrow(() -> new IllegalArgumentException("Application not found"));
-        }
 
         String storedFileName = UUID.randomUUID() + "." + extension;
         Path destination = storageDir.resolve(storedFileName);
@@ -79,7 +73,6 @@ public class CvService {
 
         CvDocument cv = new CvDocument();
         cv.setUser(user);
-        cv.setApplication(application);
         cv.setFileName(originalName);
         cv.setFilePath(destination.toString());
         cv.setLabel(label);
@@ -140,9 +133,12 @@ public class CvService {
     }
 
     private CvResponse toResponse(CvDocument cv) {
+        List<CvUsageResponse> usedIn = applicationRepository.findByCvId(cv.getId()).stream()
+                .map(a -> new CvUsageResponse(a.getId(), a.getCompanyName(), a.getJobTitle()))
+                .toList();
         return new CvResponse(
                 cv.getId(), cv.getFileName(), cv.getLabel(),
-                cv.getApplication() != null ? cv.getApplication().getId() : null,
+                usedIn,
                 cv.getUploadedAt()
         );
     }

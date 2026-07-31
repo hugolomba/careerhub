@@ -62,7 +62,7 @@ class CvServiceTest {
         when(userRepository.findByEmail("hugo@example.com")).thenReturn(Optional.of(currentUser));
         MockMultipartFile file = new MockMultipartFile("file", "resume.pdf", "application/pdf", "content".getBytes());
 
-        service.upload(file, "Main CV", null);
+        service.upload(file, "Main CV");
 
         ArgumentCaptor<CvDocument> captor = ArgumentCaptor.forClass(CvDocument.class);
         verify(cvRepository).save(captor.capture());
@@ -74,7 +74,7 @@ class CvServiceTest {
     void upload_throws_whenExtensionIsNotAllowed() {
         MockMultipartFile file = new MockMultipartFile("file", "resume.exe", "application/octet-stream", "content".getBytes());
 
-        assertThatThrownBy(() -> service.upload(file, null, null))
+        assertThatThrownBy(() -> service.upload(file, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Only PDF or DOCX");
 
@@ -85,7 +85,7 @@ class CvServiceTest {
     void upload_throws_whenFileIsEmpty() {
         MockMultipartFile file = new MockMultipartFile("file", "resume.pdf", "application/pdf", new byte[0]);
 
-        assertThatThrownBy(() -> service.upload(file, null, null))
+        assertThatThrownBy(() -> service.upload(file, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("empty");
     }

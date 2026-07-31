@@ -12,5 +12,6 @@ public record JobApplicationRequest(
         @NotNull LocalDate applicationDate,
         ApplicationStatus status, // it can be null -> default APPLIED on service
         String jobUrl,
-        String notes
+        String notes,
+        Long cvId // optional: which CV version was used for this application
 ) {}

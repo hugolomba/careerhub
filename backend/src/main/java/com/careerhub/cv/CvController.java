@@ -28,10 +28,9 @@ public class CvController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CvResponse> upload(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "label", required = false) String label,
-            @RequestParam(value = "applicationId", required = false) Long applicationId
+            @RequestParam(value = "label", required = false) String label
     ) {
-        return ResponseEntity.ok(cvService.upload(file, label, applicationId));
+        return ResponseEntity.ok(cvService.upload(file, label));
     }
 
     @GetMapping("/{id}/download")
