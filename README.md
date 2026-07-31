@@ -17,6 +17,7 @@
   - [Run with Docker Compose (recommended)](#run-with-docker-compose-recommended)
   - [Run locally without Docker](#run-locally-without-docker)
 - [Configuration](#configuration)
+- [Deployment](#deployment)
 - [API overview](#api-overview)
 - [Data model notes](#data-model-notes)
 - [Testing](#testing)
@@ -136,8 +137,37 @@ The backend reads the following environment variables (all optional, with local-
 | `SPRING_DATASOURCE_PASSWORD` | Database password | `careerhub` |
 | `JWT_SECRET` | Signing secret for JWTs | a development default (**override in production**) |
 | `CV_STORAGE_DIR` | Filesystem directory where uploaded CVs are stored | `./cv-storage` |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated list of origins allowed to call the API | `http://localhost:5173,http://localhost:3000` |
 
 Uploaded CVs are limited to PDF or DOCX files, up to 5 MB (`spring.servlet.multipart.max-file-size`).
+
+The frontend reads one build-time variable (see `frontend/.env.example`):
+
+| Variable | Description | Default |
+|----------|--------------|---------|
+| `VITE_API_URL` | Base URL of the backend API | `http://localhost:8080/api` |
+
+## Deployment
+
+This is one way to run CareerHub for free: **Vercel** for the frontend, **Render** for the backend, **Neon** for PostgreSQL. All three have a free tier; the main trade-offs are cold starts (the Render service and the Neon database both suspend after a few minutes of inactivity and take a moment to wake up) and an **ephemeral filesystem on Render's free web services** — uploaded CV files won't survive a redeploy or a spin-down. That's fine for a demo/portfolio deployment; swap `CvService`'s file storage for an object store (e.g. Cloudflare R2, S3) if you need uploads to persist.
+
+**1. Database — Neon**
+1. Create a free project at [neon.tech](https://neon.tech).
+2. Copy the connection details (host, database, username, password).
+
+**2. Backend — Render**
+1. New **Web Service** → connect this repo → root directory `backend` → Render will detect and build `backend/Dockerfile`.
+2. Set environment variables:
+   - `SPRING_DATASOURCE_URL` = `jdbc:postgresql://<neon-host>/<db>?sslmode=require`
+   - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` = from Neon
+   - `JWT_SECRET` = a long random string
+   - `CORS_ALLOWED_ORIGINS` = your Vercel URL(s), e.g. `https://careerhub.vercel.app,https://your-custom-domain.com`
+3. Deploy. Flyway applies the schema automatically on first boot.
+
+**3. Frontend — Vercel**
+1. New Project → import this repo → set **Root Directory** to `frontend` (Vercel auto-detects the Vite preset).
+2. Set the environment variable `VITE_API_URL` to your Render backend URL plus `/api` (e.g. `https://careerhub-backend.onrender.com/api`).
+3. Point your custom domain at the Vercel project. `frontend/vercel.json` handles the SPA rewrite so client-side routes work on refresh/direct navigation.
 
 ## API overview
 
